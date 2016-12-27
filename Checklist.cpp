@@ -1,40 +1,84 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+
+//TODO:Add Validation!
 
 struct Task {
     std::string toDo = "empty";
-    int priority = 0;
-    bool completed = false;
+    char priority = 0;
+    char completed = 'f';
 };
 
 static std::vector<Task> tasks;
 
 void Welcome() {
 
-std::cout << "Welcome to this simple Checklist program!" << std::endl;
-std::cout << "Type:" << std::endl << "'View' - View Checklist." << std::endl
+std::cout << "Welcome to this simple Checklist program!" << std::endl
+	  << "Type:" << std::endl << "'View' - View Checklist." << std::endl
 	  << "'Add' - Add new items to the Checklist." << std::endl
 	  << "'Remove' - Remove items from the Checklist." << std::endl
 	  << "'Complete' - Mark tasks as completed." << std::endl
+	  << "'Save' - To save the list." << std::endl
 	  << " " << std::endl;
 }
 
+void SaveList() {
+
+    std::ofstream output;
+    int SIZE = tasks.size();
+
+    output.std::ofstream::open("list.txt");
+
+    for (int i = 0; i < SIZE; ++i) {
+	
+	output << tasks[i].priority 
+	       << tasks[i].completed
+	       << tasks[i].toDo << std::endl;
+    }
+
+    output.std::ofstream::close();
+}
+
+void LoadList() {
+
+    std::ifstream input;
+    std::string line;
+    Task addTask;
+
+    input.std::ifstream::open("list.txt");
+
+    while (getline(input, line)) {
+	addTask.priority = line[0];
+	addTask.completed = line[1];
+	line.erase(0, 2);
+	addTask.toDo = line;
+	tasks.push_back(addTask);
+    }
+
+    input.std::ifstream::close();
+}
+
+void CompleteTasks() {
+    int index;
+    std::cin >> index;
+    tasks[index].completed = 'c';
+}
+
 void AddTasks() {
+    std::string enteredString;
+    char enteredPriority;
+    Task newTask;
 
-std::string enteredString;
-int enteredPriority;
-Task newTask;
+    std::cin.ignore();
+    getline(std::cin, enteredString, '-');
 
-std::cin.ignore();
-getline(std::cin, enteredString, '-');
+    std::cin >> enteredPriority;
 
-std::cin >> enteredPriority;
-
-newTask.toDo = enteredString;
-newTask.priority = enteredPriority;
-tasks.push_back(newTask);
-
+    newTask.toDo = enteredString;
+    newTask.priority = enteredPriority;
+    tasks.push_back(newTask);
 }
 
 void RemoveTasks() {
@@ -49,15 +93,15 @@ void ViewList() {
     for (int i = 0; i < SIZE; ++i) {
 	std::cout << tasks[i].toDo << " - " << tasks[i].priority;
 
-	if (tasks[i].completed == true)
+	if (tasks[i].completed == 'c')
 	    std::cout << " [X]" << std::endl;
 	else { std::cout << " [ ]" << std::endl; }
     }
 }
 
 void getInput() {
-
-    while (true) {
+	
+	while(true) {
 	std::string inputOperation;
 	std::cin >> inputOperation;
 
@@ -70,28 +114,30 @@ void getInput() {
 	    RemoveTasks();
 	}
 	else if (inputOperation == "Complete") {
-	    std::cout << "Completing" << std::endl;
+	    std::cout << "Complete: ";
+	    CompleteTasks();
 	}
 	else if (inputOperation == "View") {
 	    ViewList();
+	}
+	else if (inputOperation == "Save") {
+	    SaveList();
+	}
+	else if (inputOperation == "clear") {
+	    system("clear");
+	    Welcome();
+	}
+	else if (inputOperation == "exit") {
+	    break;
 	}
     }
 }
 
 int main() {
 
-for (int j = 0; j < 5; ++j) {
-    
-    Task addTask;
-    addTask.toDo = std::to_string(j);
-    addTask.priority = 1;
-    addTask.completed = true;
-    tasks.push_back(addTask);
-
-}
-
-Welcome();
-getInput();
+    LoadList();
+    Welcome();
+    getInput();
 
     return 0;
 }
